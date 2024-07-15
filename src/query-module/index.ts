@@ -1,1 +1,1 @@
-import { UserAccountQuery } from "./UserAccountQuery";
+export { UserAccountQuery } from "./UserAccountQuery";
