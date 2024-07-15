@@ -17,7 +17,7 @@ export class UserAccountQuery {
 
 		try {
 			const protoResponse: ProtocolResponse = await requestHelpers.request(RequestMethod.GET, url, data);
-			return protoResponse
+			return protoResponse;
 		} catch (protoErr) {
 			throw protoErr;
 		}
