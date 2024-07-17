@@ -1,8 +1,9 @@
 import { join } from "path";
-import { topLevelUrl } from ".";
+
+const topLevelUrl = "/api";
 
 export const config = {
-	topLevelUrl: "/api",
+	topLevelUrl,
 	modules: {
 		auth: {
 			moduleUrl: join(topLevelUrl, "/auth")
