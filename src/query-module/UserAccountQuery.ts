@@ -1,5 +1,7 @@
 import { ProtocolError, ProtocolResponse } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
+import { join } from "path";
+import { config } from "../config";
 
 const RequestMethod = requestHelpers.RequestMethod;
 
@@ -7,12 +9,14 @@ export class UserAccountQuery {
 	constructor() {
 	}
 
+	public static readonly baseUrl: string = join(config.modules.query.moduleUrl, "/user-account");
+
 	public static async getMyAccountInfo(
 		includeEmail: boolean = true,
 		includeUsername: boolean = true,
 		includeMainWallet: boolean = true
 	): Promise<ProtocolResponse> {
-		const url = "/api/query/user-account/my-account"
+		const url = join(this.baseUrl, "/my-account");
 
 		// Attach query-params to request
 		const requestConfig = {
