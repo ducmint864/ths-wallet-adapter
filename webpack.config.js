@@ -20,7 +20,8 @@ module.exports = {
 			"url": require.resolve("url/"),
 			"stream": require.resolve("stream-browserify"),
 			"buffer": require.resolve("buffer/"),
-			"crypto": require.resolve("crypto-browserify")
+			"crypto": require.resolve("crypto-browserify"),
+			"path": path.resolve(__dirname, 'dist'),
 		}
 	},
 	output: {
