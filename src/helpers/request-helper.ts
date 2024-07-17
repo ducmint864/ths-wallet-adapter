@@ -4,7 +4,7 @@ import https from "https";
 
 
 const baseUrl: string = process.env.WEB_SERVER_URL || "https://localhost:3000";
-const axiosInstance = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
 	baseURL: baseUrl,
 	withCredentials: true,
 	httpsAgent: new https.Agent({
