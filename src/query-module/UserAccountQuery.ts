@@ -7,12 +7,12 @@ export class UserAccountQuery {
 	constructor() {
 	}
 
-	public static async getAccountInfo(
+	public static async getMyAccountInfo(
 		includeEmail: boolean = true,
 		includeUsername: boolean = true,
 		includeMainWallet: boolean = true
 	): Promise<ProtocolResponse> {
-		const url = "/api/query/user-account/info"
+		const url = "/api/query/user-account/my-account"
 
 		// Attach query-params to request
 		const requestConfig = {
