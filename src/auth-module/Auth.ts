@@ -101,6 +101,7 @@ export class Auth {
 
 	public static async getAccessToken(): Promise<ProtocolResponse> {
 		const url = "/api/auth/get-access-token";
+		const url: string = "/api/auth/get-access-token";
 		try {
 			const protoResponse: ProtocolResponse = await requestHelpers.request(RequestMethod.GET, url);
 			return protoResponse;
