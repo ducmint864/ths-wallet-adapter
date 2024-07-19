@@ -21,9 +21,9 @@ export class UserAccountQuery {
 		// Attach query-params to request
 		const requestConfig = {
 			params: {
-				"includeEmail": includeEmail.toString(),
-				"includeUsername": includeUsername.toString(),
-				"includeMainWallet": includeMainWallet.toString(),
+				"includeEmail": includeEmail?.toString(),
+				"includeUsername": includeUsername?.toString(),
+				"includeMainWallet": includeMainWallet?.toString(),
 			}
 		}
 
