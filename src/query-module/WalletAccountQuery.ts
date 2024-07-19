@@ -3,6 +3,8 @@ import { requestHelpers } from "../helpers";
 import { bech32 } from "bech32";
 import { join } from "path";
 import { walletServerUrl } from "../config";
+import { Coin } from "thasa-wallet-interface";
+import { StargateClient } from "@cosmjs/stargate";
 
 const RequestMethod = requestHelpers.RequestMethod;
 
@@ -13,7 +15,7 @@ export class WalletAccountQuery {
 	public static readonly baseUrl = join(walletServerUrl.modules.query.moduleUrl, "/wallet-account");
 
 	/**
-	 * Validates a Bech32-encoded address
+	 * Validates a Bech32-encoded address`
 	 * @param address The Bech32 address to validate.
 	 * @returns `true` if the address is valid, `false` otherwise.
 	 */
@@ -37,10 +39,14 @@ export class WalletAccountQuery {
 	 * @throws A `ProtocolError` object if the query fails
 	 * 
 	 * Example:
-	 * ```
+	 * ```typescript
 	 * // Get all wallets of user:
 	 * const response = await WalletAccountQuery.getMyWalletInfo();
-	 * console.log(response.data); // Output: [ { address: "thasa1...", nickname: "My Wallet 1", ... }, { address: "thasa2...", nickname: "My Wallet 2", ... } ]
+	 * console.log(response.data.wallets); // Output: 
+	 * 	    wallets: [ 
+	 * 		    { address: "thasa1...", nickname: "My Wallet 1", ... },
+	 *  	    { address: "thasa2...", nickname: "My Wallet 2", ... }
+	 * 	    ]
 	 * ```
 	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
@@ -63,7 +69,6 @@ export class WalletAccountQuery {
 				"walletOrder": walletOrder?.toString(),
 			}
 		}
-		
 
 		try {
 			const protoResponse: ProtocolResponse = await requestHelpers.request(
@@ -81,9 +86,18 @@ export class WalletAccountQuery {
 	/**
 	 * Finds a wallet by its address.
 	 * @param address The Bech32 address of the wallet to find.
+	 * @param includeBalances Whether to include the wallet's balances in the response. Defaults to `false`.
 	 * @returns A `ProtocolResponse` object indicating the query results
-	 * @throws A `ProtocolError` if the query fails
-	 * 
+	 * @throws A `ProtocolError` if the address isn't valid or the query fails
+	 * @notice The `data` object inside the returned `ProtocolResponse` object:
+	 * ```JSON
+	 * {
+	 * 	address: "thasa1akb2...",
+	 * 	nickname: "Crypto Ant", // Only available if user owns this wallet.
+	 * 	walletAccountId: 19, // Only available if user had created wallet via Thasa Wallet app
+	 * 	userAccountId: 1 // Only available if user had created wallet via Thasa Wallet app
+	 * }
+	 * ``` 
 	 * Example:
 	 * ```
 	 * const response = await WalletAccountQuery.findWallet("thasa1...");
@@ -92,7 +106,16 @@ export class WalletAccountQuery {
 	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
-	public static async findWallet(address: string): Promise<ProtocolResponse> {
+	public static async findWallet(
+		address: string,
+		includeBalances: boolean = false
+	): Promise<ProtocolResponse> {
+		// Verify address
+		if (!this.isValidBech32Address(address)) {
+			throw new ProtocolError("Invalid Bech32 address", 400, ProtocolError.ERR_BAD_REQUEST);
+		}
+
+		// Make queries
 		const url: string = join(this.baseUrl, "find");
 		const requestConfig = {
 			params: {
@@ -106,9 +129,31 @@ export class WalletAccountQuery {
 				undefined,
 				requestConfig
 			);
+
+			// Check for anomaly in response data
+			if (!protoResponse.data) {
+				throw new ProtocolError("Response data is empty due to unknown error", 500, ProtocolError.ERR_BAD_RESPONSE);
+			}
+
+
+			// Get address' balances
+			if (includeBalances) {
+				const balances: readonly Coin[] = await this.getBalances(address);
+				protoResponse.data.balances = balances;
+			}
+
 			return protoResponse;
+
 		} catch (protoErr: ProtocolError | unknown) {
 			throw protoErr;
 		}
+	}
+
+	private static async getBalances(address: string): Promise<readonly Coin[]> {
+		const url = "http://localhost:26657";
+		const client: StargateClient = await StargateClient.connect(url);
+		const coins = await client.getAllBalances(address);
+		console.log(coins);
+		return coins
 	}
 }
