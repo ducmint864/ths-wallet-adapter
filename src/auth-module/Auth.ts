@@ -58,7 +58,7 @@ export class Auth {
 	 * @returns ProtocolResponse
 	 * @throws ProtocolError
 	 */
-	public static async login(password: string, email?: string, username?: string): Promise<ProtocolResponse> {
+	public static async login(password: string, email: string, username?: string): Promise<ProtocolResponse> {
 		let hasEmail: boolean, hasUsername: boolean;
 		if (email) {
 			hasEmail = true;
