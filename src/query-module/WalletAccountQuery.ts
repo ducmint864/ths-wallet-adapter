@@ -2,12 +2,12 @@ import { ProtocolError, ProtocolResponse } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
 import { bech32 } from "bech32";
 import { join } from "path";
-import { config } from "../config";
+import { walletServerUrl } from "../config";
 
 const RequestMethod = requestHelpers.RequestMethod;
 
 export class WalletAccountQuery {
-	public static readonly baseUrl = join(config.modules.query.moduleUrl, "/wallet-account");
+	public static readonly baseUrl = join(walletServerUrl.modules.query.moduleUrl, "/wallet-account");
 
 	protected static isValidBech32Address(address: string): boolean {
 		const decoded = bech32.decode(address)

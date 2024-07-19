@@ -2,7 +2,7 @@ import { join } from "path";
 
 const topLevelUrl = "/api";
 
-export const config = {
+export const walletServerUrl = {
 	topLevelUrl,
 	modules: {
 		auth: {
