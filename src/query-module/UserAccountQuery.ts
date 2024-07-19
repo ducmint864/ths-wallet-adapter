@@ -6,9 +6,6 @@ import { walletServerUrl } from "../config";
 const RequestMethod = requestHelpers.RequestMethod;
 
 export class UserAccountQuery {
-	constructor() {
-	}
-
 	public static readonly baseUrl: string = join(walletServerUrl.modules.query.moduleUrl, "/user-account");
 
 	public static async getMyAccountInfo(
