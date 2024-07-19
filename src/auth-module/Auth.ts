@@ -1,5 +1,3 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
-import createHttpError from "http-errors";
 import { ProtocolError } from "thasa-wallet-interface";
 import { ProtocolResponse } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
