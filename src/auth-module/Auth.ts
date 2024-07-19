@@ -2,20 +2,30 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import createHttpError from "http-errors";
 import { ProtocolError } from "thasa-wallet-interface";
 import { ProtocolResponse } from "thasa-wallet-interface";
-import https from "https";
 import { requestHelpers } from "../helpers";
 
 const RequestMethod = requestHelpers.RequestMethod;
 
+/**
+ * Authentication class providing methods for registering, logging in, logging out, and getting access tokens.
+ */
 export class Auth {
 	/**
-	 * 
-	 * @param email 
-	 * @param username 
-	 * @param password 
-	 * @returns ProtocolResponse
-	 * @throws ProtocolError
+	 * Registers a new user with the provided email, username, and password.
+	 *
+	 * @param email - The user's email address.
+	 * @param username - The user's chosen username.
+	 * @param password - The user's chosen password.
+	 * @returns A ProtocolResponse object indicating the registration result.
+	 * @throws ProtocolError if the registration fails.
+	 *
+	 * Example:
+	 * ```
+	 * const response = await Auth.register("user@example.com", "username", "password");
+	 * console.log(response); // { success: true, message: "User registered successfully" }
+	 * ```
 	 */
+
 	public static async register(email: string, username: string, password: string): Promise<ProtocolResponse> {
 		if (!email || !username || !password) {
 			throw new ProtocolError("Missing email or username or password", 400);
