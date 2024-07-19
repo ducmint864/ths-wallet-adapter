@@ -17,28 +17,26 @@ export class WalletAccountQuery {
 		return true;
 	}
 
+	// if both isMainWallet and walletOrder args are left blank, return all wallets of the user
 	public static async getMyWalletInfo(
 		includeAddress: boolean = true,
 		includeNickname: boolean = true,
 		includeCryptoHdPath: boolean = true,
-		isMainWallet: boolean = true,
-		walletOrder?: number
+		isMainWallet: boolean = false,
+		...walletOrder: number[] // This arg will be discarded if isMainWallet arg is true
 	): Promise<ProtocolResponse> {
 		const url: string = join(this.baseUrl, "/my-wallet");
 
-		if (!isMainWallet && !walletOrder) {
-			isMainWallet = true;
-		}
-
 		const requestConfig = {
 			params: {
-				"includeAddress": includeAddress.toString(),
-				"includeNickname": includeNickname.toString(),
-				"includeCryptoHdPath": includeCryptoHdPath.toString(),
-				"isMainWallet": isMainWallet.toString(),
+				"includeAddress": includeAddress?.toString(),
+				"includeNickname": includeNickname?.toString(),
+				"includeCryptoHdPath": includeCryptoHdPath?.toString(),
+				"isMainWallet": isMainWallet?.toString(),
 				"walletOrder": walletOrder?.toString(),
 			}
 		}
+		
 
 		try {
 			const protoResponse: ProtocolResponse = await requestHelpers.request(
