@@ -1,6 +1,9 @@
 import { ProtocolError } from "thasa-wallet-interface";
 import { ProtocolResponse } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
+import { walletServerUrl } from "../config";
+import { join } from "path";
+
 
 const RequestMethod = requestHelpers.RequestMethod;
 
@@ -8,6 +11,8 @@ const RequestMethod = requestHelpers.RequestMethod;
  * Authentication class providing methods for registering, logging in, logging out, and getting access tokens.
  */
 export class Auth {
+	public static baseUrl: string = walletServerUrl.modules.auth.moduleUrl;
+
 	/**
 	 * Registers a new user with the provided email, username, and password.
 	 *
@@ -29,7 +34,7 @@ export class Auth {
 			throw new ProtocolError("Missing email or username or password", 400);
 		}
 
-		const url = "/api/auth/register";
+		const url: string = join(this.baseUrl, "/register");
 
 		const data = {
 			"email": email,
@@ -65,7 +70,7 @@ export class Auth {
 			throw new ProtocolError("Missing email or username", 400);
 		}
 
-		const url = ("/api/auth/login");
+		const url: string = join(this.baseUrl, "/login");
 
 		const data = hasEmail ? {
 			"email": email,
@@ -85,7 +90,7 @@ export class Auth {
 
 
 	public static async logout(): Promise<ProtocolResponse> {
-		const url = ("/api/auth/logout");
+		const url: string = join(this.baseUrl, "/logout");
 		try {
 			const protoResponse: ProtocolResponse = await requestHelpers.request(RequestMethod.POST, url);
 			return protoResponse;
