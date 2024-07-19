@@ -17,11 +17,11 @@ export class UserAccountQuery {
 	/**
    	 * Retrieves the current user's account information.
    	 *
-   	 * @param {boolean} Whether to include the user's email in the response. (default: true)
-   	 * @param {boolean} Whether to include the user's username in the response. (default: true)
-   	 * @param {boolean} Whether to include the user's main wallet information in the response. (default: true)
+   	 * @param {boolean} Whether to include the user's email in the response. Defaults to `true`.
+   	 * @param {boolean} Whether to include the user's username in the response. Defaults to `true`.
+	 * @param {boolean} Whether to include the user's main wallet information in the response. Defaults to `true`.
    	 * @returns A ProtocolResponse object indicating the query result.
-	 * @throws ProtocolError object if the query fails
+	 * @throws ProtocolError object if the query fails.
 	 * 
    	 * Example:
 	 * ```
