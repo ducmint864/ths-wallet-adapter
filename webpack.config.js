@@ -22,6 +22,7 @@ module.exports = {
 			"buffer": require.resolve("buffer/"),
 			"crypto": require.resolve("crypto-browserify"),
 			"path": require.resolve('path-browserify'),
+			"vm": require.resolve("vm-browserify"),
 		}
 	},
 	output: {
