@@ -116,7 +116,7 @@ export class WalletAccountQuery {
 		}
 
 		// Make queries
-		const url: string = join(this.baseUrl, "find");
+		const url: string = join(this.baseUrl, "/find");
 		const requestConfig = {
 			params: {
 				"address": address,
@@ -134,7 +134,6 @@ export class WalletAccountQuery {
 			if (!protoResponse.data) {
 				throw new ProtocolError("Response data is empty due to unknown error", 500, ProtocolError.ERR_BAD_RESPONSE);
 			}
-
 
 			// Get address' balances
 			if (includeBalances) {
