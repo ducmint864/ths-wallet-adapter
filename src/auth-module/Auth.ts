@@ -22,14 +22,15 @@ export class Auth {
 	 * @param email - The user's email address.
 	 * @param username - The user's chosen username.
 	 * @param password - The user's chosen password.
-	 * @returns A ProtocolResponse object indicating the registration result.
-	 * @throws ProtocolError object if the registration fails.
+	 * @returns A `ProtocolResponse` object indicating the registration result.
+	 * @throws A `ProtocolError` object if the registration fails.
 	 *
 	 * Example:
 	 * ```
 	 * const response = await Auth.register("user@example.com", "username", "password");
 	 * console.log(response); // { _httpStatus: 200, _statusText: "OK", _data: { message: "Register successful" } }
 	 * ```
+	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
 	public static async register(email: string, username: string, password: string): Promise<ProtocolResponse> {
@@ -60,8 +61,8 @@ export class Auth {
 	 * @param email - The user's email address (optional).
 	 * @param username - The user's username (optional).
 	 * @notice Although email and username are both optional, user must provide at least one of them
-	 * @returns A ProtocolResponse object indicating the login result.
-	 * @throws ProtocolError object if the login fails.
+	 * @returns A `ProtocolResponse` object indicating the login result.
+	 * @throws A `ProtocolError` object if the login fails.
 	 *
 	 * Example:
 	 * ```
@@ -73,6 +74,7 @@ export class Auth {
 	 * const response = await Auth.login("password", undefined, "username");
 	 * console.log(response); // { _httpStatus: 200, _statusText: "OK", data: { message: "Login successful" } }
 	 * ```
+	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
 	public static async login(password: string, email?: string, username?: string): Promise<ProtocolResponse> {
@@ -109,14 +111,15 @@ export class Auth {
 	/**
 	 * Logs out the current user.
 	 *
-	 * @returns A ProtocolResponse object indicating the logout result.
-	 * @throws ProtocolError object if the logout fails.
+	 * @returns A `ProtocolResponse` object indicating the logout result.
+	 * @throws A `ProtocolError` object if the logout fails.
 	 *
 	 * Example:
 	 * ```
 	 * const response = await Auth.logout();
 	 * console.log(response); // { _httpStatus: 200, _statusText: "OK", data: { message: "Logout successful" } }
 	 * ```
+	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
 	public static async logout(): Promise<ProtocolResponse> {
@@ -133,14 +136,15 @@ export class Auth {
 	 * Retrieves an access token for the current user.
 	 *
 	 * @notice User must have a valid refresh token in their browser's cookies (can be acquired via login)
-	 * @returns A ProtocolResponse object containing the access token.
-	 * @throws ProtocolError object if the token retrieval fails.
+	 * @returns A `ProtocolResponse` object containing the access token.
+	 * @throws `ProtocolError` object if the token retrieval fails.
 	 *
 	 * Example:
 	 * ```
 	 * const response = await Auth.getAccessToken();
 	 * console.log(response); // { _httpStatus: 200, _statusText: "OK", data: { message: "Access token granted" }
 	 * ```
+	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
 	public static async getAccessToken(): Promise<ProtocolResponse> {

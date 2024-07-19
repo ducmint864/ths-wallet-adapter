@@ -20,8 +20,8 @@ export class UserAccountQuery {
    	 * @param {boolean} Whether to include the user's email in the response. Defaults to `true`.
    	 * @param {boolean} Whether to include the user's username in the response. Defaults to `true`.
 	 * @param {boolean} Whether to include the user's main wallet information in the response. Defaults to `true`.
-   	 * @returns A ProtocolResponse object indicating the query result.
-	 * @throws ProtocolError object if the query fails.
+   	 * @returns A `ProtocolResponse` object indicating the query result.
+	 * @throws `ProtocolError` object if the query fails.
 	 * 
    	 * Example:
 	 * ```
@@ -32,6 +32,7 @@ export class UserAccountQuery {
 	 * const response = await UserAccountQuery.getMyAccountInfo(false, false, true);
   	 * console.log(response.data); // { mainWallet: { ... } }
 	 * ```
+	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
    	 */
 	public static async getMyAccountInfo(
