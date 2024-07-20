@@ -152,7 +152,6 @@ export class WalletAccountQuery {
 		const url = "http://localhost:26657";
 		const client: StargateClient = await StargateClient.connect(url);
 		const coins = await client.getAllBalances(address);
-		console.log(coins);
 		return coins
 	}
 }
