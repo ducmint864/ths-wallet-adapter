@@ -1,4 +1,4 @@
-import { ProtocolError, ProtocolResponse } from "thasa-wallet-interface";
+import { ProtocolError, ProtocolResponse, WalletAccountDTO, WalletInfo } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
 import { bech32 } from "bech32";
 import { join } from "path";
@@ -32,6 +32,7 @@ export class WalletAccountQuery {
 	 * @param includeAddress Whether to include the wallet address in the response. Defaults to `true`.
 	 * @param includeNickname Whether to include the wallet nickname in the response. Defaults to `true`.
 	 * @param includeCryptoHdPath Whether to include the wallet's crypto HD path in the response. Defaults to `true`.
+	 * @param includeBalances Whether to include the wallets' balances in the response. Defaults to `true`.
 	 * @param isMainWallet Whether to only return the main wallet. Defaults to `false`.
 	 * @param walletOrder An array of wallet orders to filter by. Only applicable if `isMainWallet` is `false`.
 	 * @notice If both isMainWallet and walletOrder args are falsy/negative, return all wallets of the user
@@ -55,11 +56,13 @@ export class WalletAccountQuery {
 		includeAddress: boolean = true,
 		includeNickname: boolean = true,
 		includeCryptoHdPath: boolean = true,
+		includeBalances: boolean = true,
 		isMainWallet: boolean = false,
 		...walletOrder: number[] // This arg will be discarded if isMainWallet arg is true
 	): Promise<ProtocolResponse> {
 		const url: string = join(this.baseUrl, "/my-wallet");
 
+		// Arrange query params
 		const requestConfig = {
 			params: {
 				"includeAddress": includeAddress?.toString(),
@@ -71,12 +74,36 @@ export class WalletAccountQuery {
 		}
 
 		try {
+			// Make request to wallet's web server
 			const protoResponse: ProtocolResponse = await requestHelpers.request(
 				RequestMethod.GET,
 				url,
 				undefined,
 				requestConfig
 			);
+
+			// Check for anomaly in response data
+			const wallets: WalletAccountDTO[] = protoResponse.data.wallets;
+			if (!wallets) {
+				throw new ProtocolError("Bad response data from wallet server", 500, ProtocolError.ERR_BAD_RESPONSE);
+			}
+
+			// Get wallets' balances
+			if (includeBalances) {
+				const balancesPromises: Promise<readonly Coin[]>[] = wallets.map(
+					(wallet: WalletAccountDTO) => this.getBalances(wallet)
+				);
+
+				const balancesArray: (readonly Coin[])[] = await Promise.all(balancesPromises);
+
+				// Use forEach for side effects
+				balancesArray.forEach((balances: readonly Coin[], index: number) => {
+					if (wallets[index]) {
+						wallets[index].balances = balances;
+					}
+				});
+			}
+
 			return protoResponse;
 		} catch (protoErr: ProtocolError | unknown) {
 			throw protoErr;
@@ -86,7 +113,7 @@ export class WalletAccountQuery {
 	/**
 	 * Finds a wallet by its address.
 	 * @param address The Bech32 address of the wallet to find.
-	 * @param includeBalances Whether to include the wallet's balances in the response. Defaults to `false`.
+	 * @param includeBalances Whether to include the wallet's balances in the response. Defaults to `true`.
 	 * @returns A `ProtocolResponse` object indicating the query results
 	 * @throws A `ProtocolError` if the address isn't valid or the query fails
 	 * @notice The `data` object inside the returned `ProtocolResponse` object:
@@ -101,21 +128,21 @@ export class WalletAccountQuery {
 	 * Example:
 	 * ```
 	 * const response = await WalletAccountQuery.findWallet("thasa1...");
-	 * console.log(response.data); // Output: { address: "thasa1...", nickname: "My Wallet", ... }
+	 * console.log(response.data); // Output: { address: "thasa1...", nickname: "My Wallet", balances: [ ... ], ... }
 	 * ```
 	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
-	public static async findWallet(
+	public static async getWalletInfo(
 		address: string,
-		includeBalances: boolean = false
+		includeBalances: boolean = true,
 	): Promise<ProtocolResponse> {
 		// Verify address
 		if (!this.isValidBech32Address(address)) {
 			throw new ProtocolError("Invalid Bech32 address", 400, ProtocolError.ERR_BAD_REQUEST);
 		}
 
-		// Make queries
+		// Request web server for basic wallet info except wallet balances
 		const url: string = join(this.baseUrl, "/find");
 		const requestConfig = {
 			params: {
@@ -131,13 +158,14 @@ export class WalletAccountQuery {
 			);
 
 			// Check for anomaly in response data
-			if (!protoResponse.data) {
-				throw new ProtocolError("Response data is empty due to unknown error", 500, ProtocolError.ERR_BAD_RESPONSE);
+			const wallet: WalletAccountDTO = protoResponse.data;
+			if (!wallet) {
+				throw new ProtocolError("Bad response data from wallet server", 500, ProtocolError.ERR_BAD_RESPONSE);
 			}
 
-			// Get address' balances
+			// Get wallet's balances
 			if (includeBalances) {
-				const balances: readonly Coin[] = await this.getBalances(address);
+				const balances: readonly Coin[] = await this.getBalances(wallet);
 				protoResponse.data.balances = balances;
 			}
 
@@ -148,11 +176,28 @@ export class WalletAccountQuery {
 		}
 	}
 
-	private static async getBalances(address: string): Promise<readonly Coin[]> {
-		const url = "http://localhost:26657";
+
+	/**
+	 * Retrieves the balances for a given wallet.
+	 * 
+	 * @param {WalletInfo} wallet - The wallet to retrieve balances for.
+	 * @param {...string[]} denoms - Optional denominations to filter balances by.
+	 * @returns {Promise<readonly Coin[]>} A promise resolving to an array of Coin objects representing the wallet's balances.
+	 */
+	private static async getBalances(
+		wallet: WalletInfo,
+		...denoms: string[]
+	): Promise<readonly Coin[]> {
+		const url = "http://localhost:26657"; // Dev
 		const client: StargateClient = await StargateClient.connect(url);
-		const coins = await client.getAllBalances(address);
-		console.log(coins);
-		return coins
+		if (denoms.length > 0) {
+			const promises: Promise<Coin>[] = denoms.map((denom) => client.getBalance(wallet.address, denom));
+			const balances: readonly Coin[] = await Promise.all(promises);
+			return balances;
+		} else {
+			const balances: readonly Coin[] = await client.getAllBalances(wallet.address);
+			return balances;
+		}
 	}
+
 }
