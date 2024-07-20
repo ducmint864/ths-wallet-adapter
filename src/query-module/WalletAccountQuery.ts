@@ -135,7 +135,7 @@ export class WalletAccountQuery {
 				throw new ProtocolError("Response data is empty due to unknown error", 500, ProtocolError.ERR_BAD_RESPONSE);
 			}
 
-			// Get address' balances
+			// Get wallet's balances
 			if (includeBalances) {
 				const balances: readonly Coin[] = await this.getBalances(address);
 				protoResponse.data.balances = balances;
