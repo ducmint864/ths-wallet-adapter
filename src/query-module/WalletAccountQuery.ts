@@ -135,7 +135,7 @@ export class WalletAccountQuery {
 	 */
 	public static async getWalletInfo(
 		address: string,
-		includeBalances: boolean = false
+		includeBalances: boolean = true,
 	): Promise<ProtocolResponse> {
 		// Verify address
 		if (!this.isValidBech32Address(address)) {
