@@ -148,7 +148,7 @@ export class WalletAccountQuery {
 		}
 	}
 
-	private static async getBalances(address: string): Promise<readonly Coin[]> {
+	public static async getBalances(address: string): Promise<readonly Coin[]> {
 		const url = "http://localhost:26657";
 		const client: StargateClient = await StargateClient.connect(url);
 		const coins = await client.getAllBalances(address);
