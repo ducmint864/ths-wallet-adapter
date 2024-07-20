@@ -1,4 +1,4 @@
-import { ProtocolError, ProtocolResponse } from "thasa-wallet-interface";
+import { ProtocolError, ProtocolResponse, WalletInfo } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
 import { bech32 } from "bech32";
 import { join } from "path";
@@ -132,12 +132,12 @@ export class WalletAccountQuery {
 
 			// Check for anomaly in response data
 			if (!protoResponse.data) {
-				throw new ProtocolError("Response data is empty due to unknown error", 500, ProtocolError.ERR_BAD_RESPONSE);
+				throw new ProtocolError("Bad response data from wallet server", 500, ProtocolError.ERR_BAD_RESPONSE);
 			}
 
 			// Get wallet's balances
 			if (includeBalances) {
-				const balances: readonly Coin[] = await this.getBalances(address);
+				const balances: readonly Coin[] = await this.getBalances(protoResponse.data as WalletInfo); // Confident type-casting
 				protoResponse.data.balances = balances;
 			}
 
@@ -148,10 +148,28 @@ export class WalletAccountQuery {
 		}
 	}
 
-	private static async getBalances(address: string): Promise<readonly Coin[]> {
-		const url = "http://localhost:26657";
+
+	/**
+	 * Retrieves the balances for a given wallet.
+	 * 
+	 * @param {WalletInfo} wallet - The wallet to retrieve balances for.
+	 * @param {...string[]} denoms - Optional denominations to filter balances by.
+	 * @returns {Promise<readonly Coin[]>} A promise resolving to an array of Coin objects representing the wallet's balances.
+	 */
+	private static async getBalances(
+		wallet: WalletInfo,
+		...denoms: string[]
+	): Promise<readonly Coin[]> {
+		const url = "http://localhost:26657"; // Dev
 		const client: StargateClient = await StargateClient.connect(url);
-		const coins = await client.getAllBalances(address);
-		return coins
+		if (denoms.length > 0) {
+			const promises: Promise<Coin>[] = denoms.map((denom) => client.getBalance(wallet.address, denom));
+			const balances: readonly Coin[] = await Promise.all(promises);
+			return balances;
+		} else {
+			const balances: readonly Coin[] = await client.getAllBalances(wallet.address);
+			return balances;
+		}
 	}
+
 }
