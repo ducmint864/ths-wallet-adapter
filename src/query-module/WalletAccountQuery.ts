@@ -165,7 +165,7 @@ export class WalletAccountQuery {
 
 			// Get wallet's balances
 			if (includeBalances) {
-				const balances: readonly Coin[] = await this.getBalances(protoResponse.data as WalletInfo); // Confident type-casting
+				const balances: readonly Coin[] = await this.getBalances(wallet);
 				protoResponse.data.balances = balances;
 			}
 
