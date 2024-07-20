@@ -86,7 +86,7 @@ export class WalletAccountQuery {
 	/**
 	 * Finds a wallet by its address.
 	 * @param address The Bech32 address of the wallet to find.
-	 * @param includeBalances Whether to include the wallet's balances in the response. Defaults to `false`.
+	 * @param includeBalances Whether to include the wallet's balances in the response. Defaults to `true`.
 	 * @returns A `ProtocolResponse` object indicating the query results
 	 * @throws A `ProtocolError` if the address isn't valid or the query fails
 	 * @notice The `data` object inside the returned `ProtocolResponse` object:
@@ -101,7 +101,7 @@ export class WalletAccountQuery {
 	 * Example:
 	 * ```
 	 * const response = await WalletAccountQuery.findWallet("thasa1...");
-	 * console.log(response.data); // Output: { address: "thasa1...", nickname: "My Wallet", ... }
+	 * console.log(response.data); // Output: { address: "thasa1...", nickname: "My Wallet", balances: [ ... ], ... }
 	 * ```
 	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
