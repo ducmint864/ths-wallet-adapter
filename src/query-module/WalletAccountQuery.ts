@@ -131,7 +131,8 @@ export class WalletAccountQuery {
 			);
 
 			// Check for anomaly in response data
-			if (!protoResponse.data) {
+			const wallet: WalletAccountDTO = protoResponse.data;
+			if (!wallet) {
 				throw new ProtocolError("Bad response data from wallet server", 500, ProtocolError.ERR_BAD_RESPONSE);
 			}
 
