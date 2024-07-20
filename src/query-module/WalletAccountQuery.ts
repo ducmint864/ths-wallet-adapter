@@ -115,7 +115,7 @@ export class WalletAccountQuery {
 			throw new ProtocolError("Invalid Bech32 address", 400, ProtocolError.ERR_BAD_REQUEST);
 		}
 
-		// Make queries
+		// Request web server for basic wallet info except wallet balances
 		const url: string = join(this.baseUrl, "/find");
 		const requestConfig = {
 			params: {
