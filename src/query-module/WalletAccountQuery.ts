@@ -106,7 +106,7 @@ export class WalletAccountQuery {
 	 * 
 	 * More detailed examples at {@link https://github.com/ducmint864/ths-wallet-adapter}
 	 */
-	public static async findWallet(
+	public static async getWalletInfo(
 		address: string,
 		includeBalances: boolean = false
 	): Promise<ProtocolResponse> {
