@@ -1,4 +1,4 @@
-import { ProtocolError, ProtocolResponse, WalletInfo } from "thasa-wallet-interface";
+import { ProtocolError, ProtocolResponse, WalletAccountDTO, WalletInfo } from "thasa-wallet-interface";
 import { requestHelpers } from "../helpers";
 import { bech32 } from "bech32";
 import { join } from "path";
@@ -32,6 +32,7 @@ export class WalletAccountQuery {
 	 * @param includeAddress Whether to include the wallet address in the response. Defaults to `true`.
 	 * @param includeNickname Whether to include the wallet nickname in the response. Defaults to `true`.
 	 * @param includeCryptoHdPath Whether to include the wallet's crypto HD path in the response. Defaults to `true`.
+	 * @param includeBalances Whether to include the wallets' balances in the response. Defaults to `true`.
 	 * @param isMainWallet Whether to only return the main wallet. Defaults to `false`.
 	 * @param walletOrder An array of wallet orders to filter by. Only applicable if `isMainWallet` is `false`.
 	 * @notice If both isMainWallet and walletOrder args are falsy/negative, return all wallets of the user
@@ -55,11 +56,13 @@ export class WalletAccountQuery {
 		includeAddress: boolean = true,
 		includeNickname: boolean = true,
 		includeCryptoHdPath: boolean = true,
+		includeBalances: boolean = true,
 		isMainWallet: boolean = false,
 		...walletOrder: number[] // This arg will be discarded if isMainWallet arg is true
 	): Promise<ProtocolResponse> {
 		const url: string = join(this.baseUrl, "/my-wallet");
 
+		// Arrange query params
 		const requestConfig = {
 			params: {
 				"includeAddress": includeAddress?.toString(),
@@ -71,12 +74,36 @@ export class WalletAccountQuery {
 		}
 
 		try {
+			// Make request to wallet's web server
 			const protoResponse: ProtocolResponse = await requestHelpers.request(
 				RequestMethod.GET,
 				url,
 				undefined,
 				requestConfig
 			);
+
+			// Check for anomaly in response data
+			const wallets: WalletAccountDTO[] = protoResponse.data.wallets;
+			if (!wallets) {
+				throw new ProtocolError("Bad response data from wallet server", 500, ProtocolError.ERR_BAD_RESPONSE);
+			}
+
+			// Get wallets' balances
+			if (includeBalances) {
+				const balancesPromises: Promise<readonly Coin[]>[] = wallets.map(
+					(wallet: WalletAccountDTO) => this.getBalances(wallet)
+				);
+
+				const balancesArray: (readonly Coin[])[] = await Promise.all(balancesPromises);
+
+				// Use forEach for side effects
+				balancesArray.forEach((balances: readonly Coin[], index: number) => {
+					if (wallets[index]) {
+						wallets[index].balances = balances;
+					}
+				});
+			}
+
 			return protoResponse;
 		} catch (protoErr: ProtocolError | unknown) {
 			throw protoErr;
