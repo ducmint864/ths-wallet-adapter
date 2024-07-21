@@ -176,6 +176,19 @@ export class WalletAccountQuery {
 		}
 	}
 
+	/**
+	 * Retrieves the balances for a given wallet.
+	 * 
+	 * @param {string} address - The address of the wallet to retrieve balances for.
+	 * @param {...string[]} denoms - Optional denominations to filter balances by.
+	 * @returns {Promise<readonly Coin[]>} A promise resolving to an array of Coin objects representing the wallet's balances.
+	 * 
+	 * Example:
+	 * ```typescript
+	 * const balances: readonly Coin[] = await WalletAccountQuery.getBalances("thasa1...", "uluna");
+	 * console.log(balances); // Output: [ { amount: "100000000", denom: "uluna" } ]
+	 * ```
+	 */
 	public static async getBalances(
 		address: string,
 		...denoms: string[]
