@@ -91,7 +91,7 @@ export class WalletAccountQuery {
 			// Get wallets' balances
 			if (includeBalances) {
 				const balancesPromises: Promise<readonly Coin[]>[] = wallets.map(
-					(wallet: WalletAccountDTO) => this.getBalances(wallet)
+					(wallet: WalletAccountDTO) => this._getBalances(wallet)
 				);
 
 				const balancesArray: (readonly Coin[])[] = await Promise.all(balancesPromises);
@@ -165,7 +165,7 @@ export class WalletAccountQuery {
 
 			// Get wallet's balances
 			if (includeBalances) {
-				const balances: readonly Coin[] = await this.getBalances(wallet);
+				const balances: readonly Coin[] = await this._getBalances(wallet);
 				protoResponse.data.balances = balances;
 			}
 
@@ -176,6 +176,15 @@ export class WalletAccountQuery {
 		}
 	}
 
+	public static async getBalances(
+		address: string,
+		...denoms: string[]
+	): Promise<readonly Coin[]> {
+		const wallet: WalletAccountDTO = { address };
+		const balances: readonly Coin[] = await this._getBalances(wallet, ...denoms);
+		return balances;
+	}
+
 
 	/**
 	 * Retrieves the balances for a given wallet.
@@ -184,7 +193,7 @@ export class WalletAccountQuery {
 	 * @param {...string[]} denoms - Optional denominations to filter balances by.
 	 * @returns {Promise<readonly Coin[]>} A promise resolving to an array of Coin objects representing the wallet's balances.
 	 */
-	private static async getBalances(
+	private static async _getBalances(
 		wallet: WalletInfo,
 		...denoms: string[]
 	): Promise<readonly Coin[]> {
