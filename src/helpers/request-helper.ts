@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from "axios";
+import { AxiosError, AxiosResponse, AxiosRequestConfig } from "axios";
 import { ProtocolResponse, ProtocolError } from "thasa-wallet-interface";
 import { getCsrfToken } from "./credential-helper";
 import { axiosInstance } from "../common/axios-instance";
