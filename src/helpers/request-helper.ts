@@ -1,16 +1,7 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from "axios";
 import { ProtocolResponse, ProtocolError } from "thasa-wallet-interface";
-import https from "https";
-
-
-const baseUrl: string = process.env.WEB_SERVER_URL || "https://localhost:3000";
-const axiosInstance: AxiosInstance = axios.create({
-	baseURL: baseUrl,
-	withCredentials: true,
-	httpsAgent: new https.Agent({
-		rejectUnauthorized: false, // Development only (Change this in production)
-	}),
-});
+import { getCsrfToken } from "./credential-helper";
+import { axiosInstance } from "../common/axios-instance";
 
 enum RequestMethod {
 	GET,
