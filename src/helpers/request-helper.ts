@@ -19,9 +19,19 @@ enum RequestMethod {
  * @returns ProtocolResponse if request succeeds
  * @throws ProtocolError if request fails
  */
-async function request(method: RequestMethod, url: string, data?: object, requestConfig?: object): Promise<ProtocolResponse> {
+async function request(
+	method: RequestMethod,
+	url: string,
+	data?: object,
+	requestConfig?: AxiosRequestConfig
+): Promise<ProtocolResponse> {
 	if (!url) {
 		throw new ProtocolError("Invalid request URL", 400);
+	}
+
+	// Inject X-CSRF-TOKEN
+	if (!requestConfig.headers["X-CSRF-TOKEN"]) {
+		requestConfig.headers["X-CSRF-TOKEN"] = getCsrfToken() ?? "";
 	}
 
 	try {
@@ -48,15 +58,18 @@ async function request(method: RequestMethod, url: string, data?: object, reques
 			default:
 				throw new ProtocolError(`Unsupported request method: ${method}`, 501);
 		}
-		return ProtocolResponse.fromAxiosResponse(response);	
+		return ProtocolResponse.fromAxiosResponse(response);
 	} catch (err) {
 		if (err instanceof AxiosError) {
 			throw ProtocolError.fromAxiosError(err);
 		} else {
 			throw ProtocolError.fromError(err);
-		} 
+		}
 	}
 }
 
 
-export { request, RequestMethod }
+export {
+	request,
+	RequestMethod,
+}
