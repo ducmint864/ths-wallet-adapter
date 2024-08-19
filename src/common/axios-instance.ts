@@ -10,4 +10,4 @@ const axiosInstance: AxiosInstance = axios.create({
 	}),
 });
 
-export { axiosInstance }
+export { axiosInstance };
