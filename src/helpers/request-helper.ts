@@ -29,6 +29,14 @@ async function request(
 		throw new ProtocolError("Invalid request URL", 400);
 	}
 
+	if (!requestConfig) {
+		requestConfig = {};
+	} 
+
+	if (!requestConfig.headers) {
+		requestConfig.headers = { };
+	}
+
 	// Inject X-CSRF-TOKEN
 	if (!requestConfig.headers["X-CSRF-TOKEN"]) {
 		requestConfig.headers["X-CSRF-TOKEN"] = getCsrfToken() ?? "";
@@ -67,7 +75,6 @@ async function request(
 		}
 	}
 }
-
 
 export {
 	request,
